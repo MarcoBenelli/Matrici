@@ -1,6 +1,8 @@
 #include "Matrix.h"
+#include "Factory.h"
 
 int main() {
+    /*
     int m1, n1;
     m1 = 2;
     n1 = 3;
@@ -49,5 +51,16 @@ int main() {
     (M4 - M1).print();
     M1 += M4;
     M1.print();
+     */
+    Factory<float> factory1;
+    Matrix<float> M2(factory1.createMatrix(5, 6));
+    float k = 0;
+    for (int i = 0; i < 5; ++i)
+        for (int j = 0; j < 6; ++j)
+            M2.element(i, j) = ++k;
+    M2.print();
+    Matrix<float> M3(M2.slice(1, 1, 3, 4));
+    M3.print();
+    (-M3).print();
     return 0;
 }

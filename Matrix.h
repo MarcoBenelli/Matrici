@@ -53,7 +53,9 @@ public:
         return *this = *this * scalar;
     }
 
-    Matrix<T> operator-() const;
+    Matrix<T> operator-() const {
+        return *this * -1;
+    }
 
     Matrix<T> operator-(const Matrix &right) const {
         return *this + -right;
@@ -69,7 +71,7 @@ public:
         return *this = *this * right;
     }
 
-    Matrix<T> slice(int imin, int jmin, int imax, int jmax) const;
+    Matrix<T> slice(int iMin, int jMin, int iMax, int jMax) const;
 
     Matrix<T> trasposta() const;
 
@@ -153,21 +155,12 @@ Matrix<T> Matrix<T>::operator*(const Matrix &right) const {
 }
 
 template<typename T>
-Matrix<T> Matrix<T>::operator-() const {
-    Matrix ans(m, n);
-    for (int i = 0; i < m; ++i)
-        for (int j = 0; j < n; ++j)
-            ans.element(i, j) = -element(i, j);
-    return ans;
-}
-
-template<typename T>
-Matrix<T> Matrix<T>::slice(int imin, int jmin, int imax, int jmax) const {
+Matrix<T> Matrix<T>::slice(int iMin, int jMin, int iMax, int jMax) const {
     //i min sono compresi, i max no
-    Matrix ans(imax - imin, jmax - jmin);
+    Matrix ans(iMax - iMin, jMax - jMin);
     for (int i = 0; i < ans.m; ++i)
         for (int j = 0; j < ans.n; ++j)
-            ans.element(i, j) = element(imin + i, jmin + j);
+            ans.element(i, j) = element(iMin + i, jMin + j);
     return ans;
 }
 
