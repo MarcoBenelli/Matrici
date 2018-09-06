@@ -13,6 +13,8 @@ class Matrix {
 public:
     Matrix(int m, int n);
 
+    int a;
+
     virtual ~Matrix() {
         delete[] buffer;
     }
