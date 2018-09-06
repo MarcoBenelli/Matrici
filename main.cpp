@@ -1,5 +1,6 @@
 #include "matrix/Matrix.h"
 #include "matrix/Factory.h"
+#include "matrix_tests/lib/googletest-release-1.8.1/googletest/include/gtest/gtest.h"
 
 int main() {
     /*
@@ -58,9 +59,9 @@ int main() {
     for (int i = 0; i < 5; ++i)
         for (int j = 0; j < 6; ++j)
             M2.element(i, j) = ++k;
-    M2.print();
+    std::cout << M2;
     Matrix<float> M3(M2.slice(1, 1, 3, 4));
-    M3.print();
-    (-M3).print();
+    std::cout << M3;
+    std::cout << -M3;
     return 0;
 }

@@ -21,7 +21,13 @@ public:
         return buffer[i * n + j];
     }
 
-    void print() const;
+    friend std::ostream &operator<<(std::ostream &os, const Matrix<T> &M) {
+        for (int i = 0; i < M.m; ++i) {
+            for (int j = 0; j < M.n; ++j)
+                std::cout << M.element(i, j) << " ";
+            std::cout << std::endl;
+        }
+    }
 
     Matrix(const Matrix &original);
 
@@ -83,15 +89,6 @@ private:
 };
 
 template<typename T>
-void Matrix<T>::print() const {
-    for (int i = 0; i < m; ++i) {
-        for (int j = 0; j < n; ++j)
-            std::cout << element(i, j) << " ";
-        std::cout << std::endl;
-    }
-}
-
-template<typename T>
 //The warning is wrong
 Matrix<T>::Matrix(const Matrix &original) : Matrix(original.m, original.n) {
     copy(original);
@@ -102,7 +99,7 @@ Matrix<T> &Matrix<T>::operator=(const Matrix &right) {
     delete[] buffer;
     m = right.m;
     n = right.n;
-    buffer = new T(m * n);
+    buffer = new T[m * n];
     copy(right);
     return *this;
 }
