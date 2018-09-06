@@ -92,6 +92,7 @@ void Matrix<T>::print() const {
 }
 
 template<typename T>
+//The warning is wrong
 Matrix<T>::Matrix(const Matrix &original) : Matrix(original.m, original.n) {
     copy(original);
 }

@@ -3,4 +3,12 @@ project(Matrici)
 
 set(CMAKE_CXX_STANDARD 11)
 
-add_executable(Matrici main.cpp Matrix.h Factory.h)
+set(SOURCE_FILES main.cpp)
+add_executable(matrix_run ${SOURCE_FILES})
+
+include_directories(matrix)
+
+add_subdirectory(matrix)
+add_subdirectory(matrix_tests)
+
+target_link_libraries(matrix_run matrix)

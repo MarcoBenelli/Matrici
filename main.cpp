@@ -1,5 +1,5 @@
-#include "Matrix.h"
-#include "Factory.h"
+#include "matrix/Matrix.h"
+#include "matrix/Factory.h"
 
 int main() {
     /*
