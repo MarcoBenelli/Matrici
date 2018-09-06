@@ -11,7 +11,7 @@
 template<typename T>
 class Matrix {
 public:
-    Matrix(int m, int n) : m(m), n(n), buffer(new T[m * n]) {}
+    Matrix(int m, int n);
 
     virtual ~Matrix() {
         delete[] buffer;
@@ -89,6 +89,15 @@ private:
 };
 
 template<typename T>
+Matrix<T>::Matrix(int m, int n) {
+    if (m <= 0)
+        m = 1;
+    if (n <= 0)
+        n = 1;
+    buffer = new T[m * n];
+}
+
+template<typename T>
 //The warning is wrong
 Matrix<T>::Matrix(const Matrix &original) : Matrix(original.m, original.n) {
     copy(original);
@@ -155,6 +164,22 @@ Matrix<T> Matrix<T>::operator*(const Matrix &right) const {
 template<typename T>
 Matrix<T> Matrix<T>::slice(int iMin, int jMin, int iMax, int jMax) const {
     //i min sono compresi, i max no
+    if (iMin < 0)
+        iMin = 0;
+    else if (iMin >= m)
+        iMin = m - 1;
+    if (iMax <= 0)
+        iMax = 1;
+    else if (iMax > m)
+        iMax = m;
+    if (jMin < 0)
+        jMin = 0;
+    else if (jMin >= n)
+        jMin = n - 1;
+    if (jMax <= 0)
+        jMax = 1;
+    else if (jMax > n)
+        jMax = n;
     Matrix ans(iMax - iMin, jMax - jMin);
     for (int i = 0; i < ans.m; ++i)
         for (int j = 0; j < ans.n; ++j)
