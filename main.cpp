@@ -44,7 +44,7 @@ int main() {
     auto M5 = M4 * M1;
     M5.print();
     std::cout << std::endl << "trasposta" << std::endl;
-    M4.trasposta().print();
+    M4.transpose().print();
     std::cout << std::endl << "meno" << std::endl;
     M1 = -M4;
     M4.print();
@@ -56,8 +56,8 @@ int main() {
     Factory<float> factory1;
     Matrix<float> M2(factory1.createMatrix(5, 6));
     float k = 0;
-    for (int i = 0; i < 5; ++i)
-        for (int j = 0; j < 6; ++j)
+    for (unsigned int i = 0, j; i < 5; ++i)
+        for (j = 0; j < 6; ++j)
             M2.element(i, j) = ++k;
     std::cout << M2;
     Matrix<float> M3(M2.slice(1, 1, 3, 4));

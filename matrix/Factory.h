@@ -11,8 +11,8 @@
 template<typename T>
 class Factory {
 public:
-    Matrix<T> createMatrix(int m, int n) {
-        Matrix<T> matrix(m, n);
+    Matrix<T> createMatrix(unsigned int m, unsigned int n) {
+        Matrix<T> matrix{m, n};
         return matrix;
     }
 };

@@ -8,22 +8,28 @@
 
 #include <iostream>
 
+#include <stdexcept>
+
 template<typename T>
 class Matrix {
 public:
-    Matrix(int m, int n);
+    Matrix(unsigned int m, unsigned int n);
 
     virtual ~Matrix() {
         delete[] buffer;
     }
 
-    T &element(int i, int j) const {
+    T &element(unsigned int i, unsigned int j) const {
+        if (i >= m)
+            throw std::out_of_range("i >= m");
+        if (j >= n)
+            throw std::out_of_range("j >= n");
         return buffer[i * n + j];
     }
 
     friend std::ostream &operator<<(std::ostream &os, const Matrix<T> &M) {
-        for (int i = 0; i < M.m; ++i) {
-            for (int j = 0; j < M.n; ++j)
+        for (unsigned int i = 0, j; i < M.m; ++i) {
+            for (j = 0; j < M.n; ++j)
                 std::cout << M.element(i, j) << " ";
             std::cout << std::endl;
         }
@@ -33,11 +39,11 @@ public:
 
     Matrix<T> &operator=(const Matrix &right);
 
-    int getM() const {
+    unsigned int getM() const {
         return m;
     }
 
-    int getN() const {
+    unsigned int getN() const {
         return n;
     }
 
@@ -77,28 +83,30 @@ public:
         return *this = *this * right;
     }
 
-    Matrix<T> slice(int iMin, int jMin, int iMax, int jMax) const;
+    Matrix<T> slice(unsigned int iMin, unsigned int jMin, unsigned int iMax, unsigned int jMax) const;
 
-    Matrix<T> trasposta() const;
+    Matrix<T> transpose() const;
 
 private:
-    int m, n;
+    unsigned int m, n;
     T *buffer;
 
     void copy(const Matrix &that);
 };
 
 template<typename T>
-Matrix<T>::Matrix(int m, int n) {
+Matrix<T>::Matrix(unsigned int m, unsigned int n) {
     if (m <= 0)
-        m = 1;
+        throw std::domain_error("m <= 0");
     if (n <= 0)
-        n = 1;
+        throw std::domain_error("n <= 0");
+    this->m = m;
+    this->n = n;
     buffer = new T[m * n];
 }
 
 template<typename T>
-//The warning is wrong
+//This warning is wrong
 Matrix<T>::Matrix(const Matrix &original) : Matrix(original.m, original.n) {
     copy(original);
 }
@@ -115,8 +123,8 @@ Matrix<T> &Matrix<T>::operator=(const Matrix &right) {
 
 template<typename T>
 void Matrix<T>::copy(const Matrix &that) {
-    for (int i = 0; i < m; ++i)
-        for (int j = 0; j < n; ++j)
+    for (unsigned int i = 0, j; i < m; ++i)
+        for (j = 0; j < n; ++j)
             element(i, j) = that.element(i, j);
 }
 
@@ -124,8 +132,8 @@ template<typename T>
 bool Matrix<T>::operator==(const Matrix &right) const {
     if (m != right.m || n != right.n)
         return false;
-    for (int i = 0; i < m; ++i)
-        for (int j = 0; j < n; ++j)
+    for (unsigned int i = 0, j; i < m; ++i)
+        for (j = 0; j < n; ++j)
             if (element(i, j) != right.element(i, j))
                 return false;
     return true;
@@ -133,65 +141,63 @@ bool Matrix<T>::operator==(const Matrix &right) const {
 
 template<typename T>
 Matrix<T> Matrix<T>::operator+(const Matrix &right) const {
-    Matrix ans(m, n);
-    for (int i = 0; i < m; ++i)
-        for (int j = 0; j < n; ++j)
+    if (m != right.m)
+        throw std::logic_error("m1 != m2");
+    if (n != right.n)
+        throw std::logic_error("n1 != n2");
+    Matrix ans{m, n};
+    for (unsigned int i = 0, j; i < m; ++i)
+        for (j = 0; j < n; ++j)
             ans.element(i, j) = element(i, j) + right.element(i, j);
     return ans;
 }
 
 template<typename T>
 Matrix<T> Matrix<T>::operator*(T scalar) const {
-    Matrix ans(m, n);
-    for (int i = 0; i < m; ++i)
-        for (int j = 0; j < n; ++j)
+    Matrix ans{m, n};
+    for (unsigned int i = 0, j; i < m; ++i)
+        for (j = 0; j < n; ++j)
             ans.element(i, j) = scalar * element(i, j);
     return ans;
 }
 
 template<typename T>
 Matrix<T> Matrix<T>::operator*(const Matrix &right) const {
-    Matrix ans(m, right.n);
-    for (int i = 0; i < m; ++i)
-        for (int j = 0; j < right.n; ++j) {
+    if (n != right.m)
+        throw std::logic_error("n1 != m2");
+    Matrix ans{m, right.n};
+    for (unsigned int i = 0, j, k; i < m; ++i)
+        for (j = 0; j < right.n; ++j) {
             ans.element(i, j) = 0;
-            for (int k = 0; k < n; ++k)
+            for (k = 0; k < n; ++k)
                 ans.element(i, j) += element(i, k) * right.element(k, j);
         }
     return ans;
 }
 
 template<typename T>
-Matrix<T> Matrix<T>::slice(int iMin, int jMin, int iMax, int jMax) const {
+Matrix<T> Matrix<T>::slice(unsigned int iMin, unsigned int jMin, unsigned int iMax, unsigned int jMax) const {
     //i min sono compresi, i max no
-    if (iMin < 0)
-        iMin = 0;
-    else if (iMin >= m)
-        iMin = m - 1;
-    if (iMax <= 0)
-        iMax = 1;
-    else if (iMax > m)
-        iMax = m;
-    if (jMin < 0)
-        jMin = 0;
-    else if (jMin >= n)
-        jMin = n - 1;
-    if (jMax <= 0)
-        jMax = 1;
-    else if (jMax > n)
-        jMax = n;
-    Matrix ans(iMax - iMin, jMax - jMin);
-    for (int i = 0; i < ans.m; ++i)
-        for (int j = 0; j < ans.n; ++j)
+    if (iMax > m)
+        throw std::out_of_range("iMax > m");
+    if (jMax > n)
+        throw std::out_of_range("jMax > n");
+    if (iMin >= iMax)
+        throw std::logic_error("iMin >= iMax");
+    if (jMin >= jMax)
+        throw std::logic_error("jMin >= jMax");
+    Matrix ans{iMax - iMin, jMax - jMin};
+    for (unsigned int i = 0, j; i < ans.m; ++i)
+        for (j = 0; j < ans.n; ++j)
             ans.element(i, j) = element(iMin + i, jMin + j);
     return ans;
 }
 
 template<typename T>
-Matrix<T> Matrix<T>::trasposta() const {
-    Matrix ans(n, m);
-    for (int i = 0; i < m; ++i)
-        for (int j = 0; j < n; ++j)
+Matrix<T> Matrix<T>::transpose() const {
+    Matrix ans{n, m};
+    for (unsigned int i = 0, j; i < m; ++i)
+        for (j = 0; j < n; ++j)
             ans.element(j, i) = element(i, j);
     return ans;
 }
