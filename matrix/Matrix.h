@@ -95,6 +95,7 @@ private:
 };
 
 template<typename T>
+//This warning is wrong
 Matrix<T>::Matrix(unsigned int m, unsigned int n) {
     if (m <= 0)
         throw std::domain_error("m <= 0");

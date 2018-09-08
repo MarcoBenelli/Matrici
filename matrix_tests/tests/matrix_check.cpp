@@ -93,6 +93,7 @@ TEST_F(MatrixExceptionTest, Slice) {
     EXPECT_THROW(M1.slice(0, 0, 1, M1.getN() + 1), std::out_of_range);
     EXPECT_THROW(M1.slice(0, 0, 0, 1), std::logic_error);
     EXPECT_THROW(M1.slice(0, 0, 1, 0), std::logic_error);
+    EXPECT_NO_THROW(M1.slice(0, 0, 1, 1));
 }
 
 int main(int argc, char **argv) {
